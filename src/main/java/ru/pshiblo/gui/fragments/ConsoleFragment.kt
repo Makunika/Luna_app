@@ -1,13 +1,13 @@
-package ru.pshiblo.gui.views
+package ru.pshiblo.gui.fragments
 
 import ru.pshiblo.gui.log.ConsoleOut
 import tornadofx.*
 
-class Console: Fragment("Консоль") {
+class ConsoleFragment: Fragment("Консоль") {
 
     override val root = borderpane {
         style {
-            paddingAll(20.0)
+            paddingTop = 20.0
         }
         center {
             ConsoleOut.getTextArea().isEditable = false

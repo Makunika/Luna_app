@@ -1,4 +1,4 @@
-package ru.pshiblo.gui.views
+package ru.pshiblo.gui.fragments
 
 import com.jfoenix.controls.JFXProgressBar
 import javafx.geometry.Pos

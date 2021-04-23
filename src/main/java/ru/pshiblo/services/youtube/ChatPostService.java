@@ -19,10 +19,10 @@ public class ChatPostService extends ServiceThread {
         while (true) {
             try {
                 insert("У нас работает бот для музыки! Для этого введите /track <название трека/ссылка на музыку из youtube>");
+                System.out.println(Config.getInstance().getTimeInsert());
                 Thread.sleep(Config.getInstance().getTimeInsert());
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                ConsoleOut.alert(e.getMessage());
             }
         }
     }

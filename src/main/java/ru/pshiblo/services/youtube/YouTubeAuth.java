@@ -5,16 +5,21 @@ import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInsta
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.auth.oauth2.OAuth2Utils;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.mtls.MtlsProvider;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.oauth2.Oauth2;
+import com.google.api.services.oauth2.model.Userinfo;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.VideoListResponse;
 import ru.pshiblo.Config;
 import ru.pshiblo.gui.log.ConsoleOut;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,38 +30,37 @@ import java.util.function.Consumer;
 
 public class YouTubeAuth {
 
-    private static final String CLIENT_SECRETS= "/client_secret.json";
+    private static final String CLIENT_SECRETS = "/client_secret.json";
+    private static final String PATH_STORE_CREDENTIALS = "tokens";
     private static final Collection<String> SCOPES =
-            List.of("https://www.googleapis.com/auth/youtube");
+            List.of("https://www.googleapis.com/auth/youtube",
+                    "https://www.googleapis.com/auth/userinfo.profile");
 
-    private static final String APPLICATION_NAME = "API code samples";
+    private static final String APPLICATION_NAME = "Luna";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
     private static YouTube youtubeService;
 
-    /**
-     * Create an authorized Credential object.
-     *
-     * @return an authorized Credential object.
-     * @throws IOException
-     */
     private static Credential authorize(final NetHttpTransport httpTransport, Consumer<String> consumer) throws IOException {
-        // Load client secrets.
-        InputStream in = YouTubeAuth.class.getResourceAsStream(CLIENT_SECRETS);
+
+        InputStream inClientSecret = YouTubeAuth.class.getResourceAsStream(CLIENT_SECRETS);
         GoogleClientSecrets clientSecrets =
-                GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-        // Build flow and trigger user authorization request.
+                GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(inClientSecret));
+
         GoogleAuthorizationCodeFlow flow =
                 new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, SCOPES)
+                        .setDataStoreFactory(new FileDataStoreFactory(new File(PATH_STORE_CREDENTIALS)))
+                        .setAccessType("offline")
                         .build();
 
-        Credential credential =
-                new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver(), new AuthorizationCodeInstalledApp.Browser() {
-                    @Override
-                    public void browse(String s) throws IOException {
-                        consumer.accept(s);
-                    }
-                }).authorize("user");
+        Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver(), consumer::accept).authorize("user");
+
+        Oauth2 oauth2 = new Oauth2.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName(
+                APPLICATION_NAME).build();
+        Userinfo userinfo = oauth2.userinfo().get().execute();
+        System.out.println(userinfo.toPrettyString());
+        Config.getInstance().setUserinfo(userinfo);
+
         return credential;
     }
 
@@ -87,12 +91,7 @@ public class YouTubeAuth {
         try {
             if (youtubeService == null) {
                 final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-                Credential credential = authorize(httpTransport, new Consumer<String>() {
-                    @Override
-                    public void accept(String s) {
-                        AuthorizationCodeInstalledApp.browse(s);
-                    }
-                });
+                Credential credential = authorize(httpTransport, AuthorizationCodeInstalledApp::browse);
                 youtubeService = new YouTube.Builder(httpTransport, JSON_FACTORY, credential)
                         .setApplicationName(APPLICATION_NAME)
                         .build();
@@ -102,6 +101,25 @@ public class YouTubeAuth {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static void exit() {
+        youtubeService = null;
+        File path = new File(PATH_STORE_CREDENTIALS);
+        recursiveDelete(path);
+    }
+
+    private static void recursiveDelete(File file) {
+        if (!file.exists())
+            return;
+
+        if (file.isDirectory()) {
+            for (File f : file.listFiles()) {
+                // рекурсивный вызов
+                recursiveDelete(f);
+            }
+        }
+        file.delete();
     }
 
     public static boolean setLiveChatId() {

@@ -1,4 +1,4 @@
-package ru.pshiblo.gui.views
+package ru.pshiblo.gui.fragments
 
 import com.jfoenix.controls.JFXCheckBox
 import com.jfoenix.controls.JFXSlider
@@ -7,7 +7,7 @@ import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.text.FontWeight
 import ru.pshiblo.Config
-import ru.pshiblo.gui.factory.Alerts
+import ru.pshiblo.gui.factory.Dialogs
 import ru.pshiblo.gui.factory.Buttons
 import ru.pshiblo.services.Context
 import ru.pshiblo.services.ServiceType
@@ -17,11 +17,11 @@ import ru.pshiblo.services.youtube.ChatPostService
 import ru.pshiblo.services.youtube.YouTubeAuth
 import tornadofx.*
 
-class MainFragment : Fragment("Главная") {
+class MainTabFragment : Fragment("Главная") {
 
     private var isRun = false
 
-    val videoIdTextField = JFXTextField().apply {
+    private val videoIdTextField = JFXTextField().apply {
         promptText = "ID трансляции"
         isLabelFloat = true
         maxWidth = 200.0
@@ -30,25 +30,34 @@ class MainFragment : Fragment("Главная") {
         })
     }
 
-    val btnStart = Buttons.createButton("Запустить", size = 20.0).also {
-        it.action {
+    val btnStart = Buttons.createButton("Запустить", size = 20.0).also { btn ->
+        btn.action {
             if (isRun) {
-                Context.removeService(ServiceType.YOUTUBE_POST)
-                Context.removeService(ServiceType.YOUTUBE_LIST)
-                videoIdTextField.isDisable = false
-                it.text = "Запустить"
-                isRun = false
+                val spinner = Dialogs.createSpinner(currentStage ?: primaryStage)
+                spinner.show()
+                runAsync {
+                    Context.removeService(ServiceType.YOUTUBE_POST)
+                    Context.removeService(ServiceType.YOUTUBE_LIST)
+                } ui {
+                    spinner.close()
+                    videoIdTextField.isDisable = false
+                    btn.text = "Запустить"
+                    isRun = false
+                }
             } else {
                 if (validate()) {
                     if (!YouTubeAuth.setLiveChatId()) {
-                        Alerts.createAlert("Неверный id трансляции", currentStage ?: primaryStage).show()
+                        Dialogs.createAlert("Неверный id трансляции", currentStage ?: primaryStage).show()
                         return@action
                     }
-                    Context.addServiceAndStart(ChatListService())
-                    Context.addServiceAndStart(ChatPostService())
-                    videoIdTextField.isDisable = true
-                    it.text = "Остановить"
-                    isRun = true
+                    runAsync {
+                        Context.addServiceAndStart(ChatListService())
+                        Context.addServiceAndStart(ChatPostService())
+                    } ui {
+                        videoIdTextField.isDisable = true
+                        btn.text = "Остановить"
+                        isRun = true
+                    }
                 }
             }
 
@@ -57,7 +66,7 @@ class MainFragment : Fragment("Главная") {
 
     override val root = borderpane {
         style {
-            paddingAll = 20
+            paddingTop = 20
         }
 
         top {
@@ -93,7 +102,7 @@ class MainFragment : Fragment("Главная") {
                                 Context.removeService(ServiceType.KEYPRESS)
                             }
                         })
-                        checkedColor = c("blue")
+                        checkedColor = c("#4da5f6")
                     })
                     add(JFXTextField((Config.getInstance().maxTimeTrack / 1000).toString()).apply {
                         style {
@@ -107,7 +116,7 @@ class MainFragment : Fragment("Главная") {
                             if (num != null) {
                                 Config.getInstance().maxTimeTrack = num * 1000
                             } else {
-                                Alerts.createAlert("Только числа!", currentStage ?: primaryStage).show()
+                                Dialogs.createAlert("Только числа!", currentStage ?: primaryStage).show()
                                 this.text = (Config.getInstance().maxTimeTrack / 1000).toString()
                             }
                         })
@@ -124,7 +133,7 @@ class MainFragment : Fragment("Главная") {
                             if (num != null) {
                                 Config.getInstance().timeInsert = num * 60 * 1000
                             } else {
-                                Alerts.createAlert("Только числа!", currentStage ?: primaryStage).show()
+                                Dialogs.createAlert("Только числа!", currentStage ?: primaryStage).show()
                                 this.text = (Config.getInstance().timeInsert / (1000 * 60)).toString()
                             }
                         })
@@ -141,7 +150,7 @@ class MainFragment : Fragment("Главная") {
                             if (num != null) {
                                 Config.getInstance().timeList = num * 1000
                             } else {
-                                Alerts.createAlert("Только числа!", currentStage ?: primaryStage).show()
+                                Dialogs.createAlert("Только числа!", currentStage ?: primaryStage).show()
                                 this.text = (Config.getInstance().timeList / 1000).toString()
                             }
                         })
@@ -194,11 +203,11 @@ class MainFragment : Fragment("Главная") {
 
     private fun validate(): Boolean {
         if (Config.getInstance().isDiscord && !Context.isInitService(ServiceType.MUSIC)) {
-            Alerts.createAlert("Забыл написать в канале !connect <название канала>", currentStage ?: primaryStage).show()
+            Dialogs.createAlert("Забыл написать в канале !connect <название канала>", currentStage ?: primaryStage).show()
             return false
         }
         if (Config.getInstance().videoId.isNullOrEmpty()) {
-            Alerts.createAlert("Забыл написать id трансляции", currentStage ?: primaryStage).show()
+            Dialogs.createAlert("Забыл написать id трансляции", currentStage ?: primaryStage).show()
             return false
         }
         return true

@@ -43,9 +43,11 @@ public class ChatListService extends ServiceThread implements ListenerService<Yo
                 listMessage();
                 Thread.sleep(Config.getInstance().getTimeList());
             }
-        } catch (InterruptedException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             ConsoleOut.alert(e.getMessage());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

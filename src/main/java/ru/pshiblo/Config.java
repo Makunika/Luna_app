@@ -1,5 +1,6 @@
 package ru.pshiblo;
 
+import com.google.api.services.oauth2.model.Userinfo;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import ru.pshiblo.property.ConfigProperties;
 import ru.pshiblo.property.Property;
@@ -35,13 +36,14 @@ public class Config {
     private String liveChatId;
     private String path;
     private boolean isDiscord;
+    private Userinfo userinfo;
 
     private ConfigProperties property;
 
 
     private Config() {
         try {
-            path = new File(".").getCanonicalPath();
+            path = new File(".").getCanonicalPath();// + "\\bin";
             property = new ConfigProperties(path + "\\config.properties");
 
             doRefresh();
@@ -159,6 +161,14 @@ public class Config {
 
     public String getTokenDiscord() {
         return tokenDiscord;
+    }
+
+    public Userinfo getUserinfo() {
+        return userinfo;
+    }
+
+    public void setUserinfo(Userinfo userinfo) {
+        this.userinfo = userinfo;
     }
 
     @Override

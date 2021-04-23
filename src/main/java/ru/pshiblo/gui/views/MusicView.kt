@@ -10,24 +10,42 @@ import ru.pshiblo.services.audio.local.LocalMusicService
 import ru.pshiblo.services.http.HttpService
 import tornadofx.*
 
-class MusicView : View("YouTube Chat") {
-    override val root = vbox(30, Pos.CENTER) {
-        hbox(20, Pos.CENTER) {
+class MusicView : View("Luna") {
+    override val root = hbox(alignment = Pos.CENTER) {
+        vbox(20, Pos.CENTER) {
+            val pb = JFXProgressBar().apply {
+                progress = -1.0
+                maxWidth = 300.0
+            }
+            pb.isVisible = false
+
+            label("Luna") {
+                style {
+                    fontSize = 50.px
+                    textFill = c("#4da5f6")
+                }
+            }
+            separator {
+                style {
+                    paddingBottom = 20.0
+                }
+            }
+
             Buttons.createButton("Использовать локальную музыку", size = 20.0).also {
                 add(it)
                 it.action {
                     Config.getInstance().isDiscord = false
 
                     this.isDisable = true
-                    this@vbox.add(JFXProgressBar().apply {
-                        progress = -1.0
-                        maxWidth = 300.0
-                    })
+
+                    pb.isVisible = true
                     runAsync {
                         Context.addServiceAndStart(LocalMusicService())
                         Context.addServiceAndStart(HttpService())
                     } ui {
-                        replaceWith<TabView>()
+                        this.isDisable = false
+                        pb.isVisible = false
+                        replaceWith<MainView>()
                     }
                 }
             }
@@ -37,18 +55,19 @@ class MusicView : View("YouTube Chat") {
                     Config.getInstance().isDiscord = true
 
                     this.isDisable = true
-                    this@vbox.add(JFXProgressBar().apply {
-                        progress = -1.0
-                        maxWidth = 300.0
-                    })
+                    pb.isVisible = true
                     runAsync {
                         Context.addServiceAndStart(DiscordMusicService())
                         Context.addServiceAndStart(HttpService())
                     } ui {
-                        replaceWith<TabView>()
+                        this.isDisable = false
+                        pb.isVisible = false
+                        replaceWith<MainView>()
                     }
                 }
             }
+
+            add(pb)
         }
     }
 }

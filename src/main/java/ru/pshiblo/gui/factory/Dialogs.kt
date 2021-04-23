@@ -2,16 +2,14 @@ package ru.pshiblo.gui.factory
 
 import tornadofx.*
 import com.jfoenix.animation.alert.JFXAlertAnimation
-import com.jfoenix.controls.JFXAlert
-import com.jfoenix.controls.JFXButton
-import com.jfoenix.controls.JFXDialogLayout
+import com.jfoenix.controls.*
 import javafx.scene.Node
 import javafx.scene.control.Label
 import javafx.stage.Modality
 import javafx.stage.Stage
 
 
-object Alerts {
+object Dialogs {
     fun createAlert(text: String, stage: Stage): JFXAlert<Void> {
         val layout = JFXDialogLayout()
         val body = Label(text)
@@ -39,5 +37,20 @@ object Alerts {
             alert.close()
         }
         return alert
+    }
+
+    fun createSpinner(stage: Stage): JFXAlert<Void> {
+        val layout = JFXDialogLayout()
+        layout.setBody(JFXSpinner().apply {
+            progress = -1.0
+        })
+        val alert = JFXAlert<Void>(stage)
+        alert.setContent(layout)
+        alert.animation = JFXAlertAnimation.BOTTOM_ANIMATION
+        alert.initModality(Modality.NONE)
+        alert.isHideOnEscape = true
+        alert.isOverlayClose = false
+        return alert
+
     }
 }

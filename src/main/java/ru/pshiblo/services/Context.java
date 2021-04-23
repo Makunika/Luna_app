@@ -60,4 +60,8 @@ public class Context {
         return ((MusicService) getService(ServiceType.MUSIC));
     }
 
+    public static void removeAllService() {
+        shutdownAllService();
+        services.clear();
+    }
 }

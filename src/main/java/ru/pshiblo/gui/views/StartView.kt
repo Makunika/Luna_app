@@ -3,24 +3,22 @@ package ru.pshiblo.gui.views
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import javafx.application.Platform
 import javafx.geometry.Pos
-import javafx.scene.Scene
-import javafx.scene.web.WebEngine
-import javafx.scene.web.WebView
-import javafx.stage.StageStyle
-import ru.pshiblo.gui.factory.Alerts
+import ru.pshiblo.gui.factory.Dialogs
 import ru.pshiblo.gui.factory.Buttons
+import ru.pshiblo.gui.fragments.Browser
 import ru.pshiblo.services.youtube.YouTubeAuth
 import tornadofx.*
 
-class StartView: View("YouTube Chat") {
+class StartView: View("Luna") {
 
     override var root = hbox(alignment = Pos.CENTER) {
         vbox(10, alignment = Pos.CENTER) {
             vbox(spacing = 50, alignment = Pos.CENTER) {
 
-                label("YouTube Chat Application") {
+                label("Luna") {
                     style {
                         fontSize = 50.px
+                        textFill = c("#4da5f6")
                     }
                 }
 
@@ -35,7 +33,7 @@ class StartView: View("YouTube Chat") {
                                 }
                             }) {
                             Platform.runLater {
-                                Alerts.createAlert("Авторизация не прошла, попробуйте снова", currentStage ?: primaryStage).show()
+                                Dialogs.createAlert("Авторизация не прошла, попробуйте снова", currentStage ?: primaryStage).show()
                             }
                         } else {
                             Platform.runLater {
@@ -49,7 +47,7 @@ class StartView: View("YouTube Chat") {
                 hyperlink("Войти через браузер") {
                     action {
                         if (!YouTubeAuth.auth()) {
-                            Alerts.createAlert("Авторизация не прошла, попробуйте снова", currentStage ?: primaryStage).show()
+                            Dialogs.createAlert("Авторизация не прошла, попробуйте снова", currentStage ?: primaryStage).show()
                         } else {
                             replaceWith<MusicView>()
                         }
