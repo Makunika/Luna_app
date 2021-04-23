@@ -6,6 +6,7 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.googleapis.mtls.MtlsProvider;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -20,6 +21,7 @@ import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class YouTubeAuth {
 
@@ -38,7 +40,7 @@ public class YouTubeAuth {
      * @return an authorized Credential object.
      * @throws IOException
      */
-    private static Credential authorize(final NetHttpTransport httpTransport) throws IOException {
+    private static Credential authorize(final NetHttpTransport httpTransport, Consumer<String> consumer) throws IOException {
         // Load client secrets.
         InputStream in = YouTubeAuth.class.getResourceAsStream(CLIENT_SECRETS);
         GoogleClientSecrets clientSecrets =
@@ -47,27 +49,15 @@ public class YouTubeAuth {
         GoogleAuthorizationCodeFlow flow =
                 new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, SCOPES)
                         .build();
-        Credential credential =
-                new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
-        return credential;
-    }
 
-    /**
-     * Build and return an authorized API client service.
-     *
-     * @return an authorized API client service
-     * @throws GeneralSecurityException, IOException
-     */
-    private static YouTube getService() throws GeneralSecurityException, IOException {
-        if (youtubeService == null) {
-            final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-            Credential credential = authorize(httpTransport);
-            return new YouTube.Builder(httpTransport, JSON_FACTORY, credential)
-                    .setApplicationName(APPLICATION_NAME)
-                    .build();
-        } else {
-            return youtubeService;
-        }
+        Credential credential =
+                new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver(), new AuthorizationCodeInstalledApp.Browser() {
+                    @Override
+                    public void browse(String s) throws IOException {
+                        consumer.accept(s);
+                    }
+                }).authorize("user");
+        return credential;
     }
 
     public static YouTube getYoutubeService() {
@@ -77,9 +67,36 @@ public class YouTubeAuth {
         return youtubeService;
     }
 
+    public static boolean auth(Consumer<String> consumer) {
+        try {
+            if (youtubeService == null) {
+                final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+                Credential credential = authorize(httpTransport, consumer);
+                youtubeService = new YouTube.Builder(httpTransport, JSON_FACTORY, credential)
+                        .setApplicationName(APPLICATION_NAME)
+                        .build();
+            }
+            return true;
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static boolean auth() {
         try {
-            youtubeService = getService();
+            if (youtubeService == null) {
+                final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+                Credential credential = authorize(httpTransport, new Consumer<String>() {
+                    @Override
+                    public void accept(String s) {
+                        AuthorizationCodeInstalledApp.browse(s);
+                    }
+                });
+                youtubeService = new YouTube.Builder(httpTransport, JSON_FACTORY, credential)
+                        .setApplicationName(APPLICATION_NAME)
+                        .build();
+            }
             return true;
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();

@@ -80,6 +80,10 @@
     <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:win:11" level="project" />
     <orderEntry type="library" name="Maven: org.openjfx:javafx-base:11" level="project" />
     <orderEntry type="library" name="Maven: org.openjfx:javafx-base:win:11" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-web:11" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-web:win:11" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-media:11" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-media:win:11" level="project" />
     <orderEntry type="library" name="Maven: com.google.apis:google-api-services-youtube:v3-rev20210210-1.31.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.api-client:google-api-client:1.31.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.oauth-client:google-oauth-client:1.31.2" level="project" />
