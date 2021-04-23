@@ -59,11 +59,15 @@ public class YouTubeAuth {
      * @throws GeneralSecurityException, IOException
      */
     private static YouTube getService() throws GeneralSecurityException, IOException {
-        final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-        Credential credential = authorize(httpTransport);
-        return new YouTube.Builder(httpTransport, JSON_FACTORY, credential)
-                .setApplicationName(APPLICATION_NAME)
-                .build();
+        if (youtubeService == null) {
+            final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+            Credential credential = authorize(httpTransport);
+            return new YouTube.Builder(httpTransport, JSON_FACTORY, credential)
+                    .setApplicationName(APPLICATION_NAME)
+                    .build();
+        } else {
+            return youtubeService;
+        }
     }
 
     public static YouTube getYoutubeService() {
@@ -76,6 +80,16 @@ public class YouTubeAuth {
     public static boolean auth() {
         try {
             youtubeService = getService();
+            return true;
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean setLiveChatId() {
+        try {
+            YouTube youtubeService = getYoutubeService();
             YouTube.Videos.List requestVideos = youtubeService.videos()
                     .list(List.of("snippet","contentDetails","statistics", "liveStreamingDetails"));
             VideoListResponse response = requestVideos.setId(List.of(Config.getInstance().getVideoId())).execute();
@@ -85,7 +99,7 @@ public class YouTubeAuth {
             }
             Config.getInstance().setLiveChatId(response.getItems().get(0).getLiveStreamingDetails().getActiveLiveChatId());
             return true;
-        } catch (GeneralSecurityException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             ConsoleOut.alert(e.getMessage());
             return false;

@@ -23,13 +23,16 @@ public class Context {
         }
 
         if (!service.isInitializer()) {
-            throw new IllegalStateException("service not is init! " + serviceType);
+            throw new IllegalStateException("service not init! " + serviceType);
         }
 
         return service;
     }
 
     public static void removeService(ServiceType serviceType) {
+        if (isInitService(serviceType)) {
+            shutdownService(serviceType);
+        }
         services.remove(serviceType);
     }
 

@@ -21,7 +21,6 @@ class Init:Fragment("Настройки") {
     private val timeList = SimpleLongProperty()
     private val globalListener = checkbox {
         isSelected = false
-        this.selectedProperty()
     }
     private val configYouTube = Config.getInstance()
 
@@ -77,7 +76,7 @@ class Init:Fragment("Настройки") {
                                 }
                                 configYouTube.videoId = videoId.text
                                 println(Config.getInstance().toString())
-                                if (!YouTubeAuth.auth()) {
+                                if (!YouTubeAuth.setLiveChatId()) {
                                     alert(Alert.AlertType.ERROR, "YouTube", "невалидный id трансляции")
                                     return@action
                                 }
