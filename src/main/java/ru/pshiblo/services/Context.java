@@ -53,7 +53,7 @@ public class Context {
     }
 
     public static void shutdownAllService() {
-        services.values().forEach((Service::shutdown));
+        services.values().parallelStream().forEach((Service::shutdown));
     }
 
     public static MusicService getMusicService() {

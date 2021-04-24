@@ -23,10 +23,14 @@ class MyApp: App(StartView::class) {
             it.consume()
             Dialogs.createSpinner(stage).show()
             runAsync {
-                Config.getInstance().saveConfig()
-                Context.shutdownAllService()
-                Platform.exit()
-                exitProcess(0)
+                try {
+                    Config.getInstance().saveConfig()
+                    Context.shutdownAllService()
+                    Platform.exit()
+                    exitProcess(0)
+                } catch(e: Throwable) {
+                    exitProcess(0)
+                }
             }
         }
         super.start(stage)

@@ -1,6 +1,7 @@
 package ru.pshiblo.github.updating;
 
 import org.kohsuke.github.*;
+import ru.pshiblo.Config;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,21 +16,20 @@ public class UpdateApplication {
 
     private String browserDownloadUrl;
 
-    public String checkUpdate() throws IOException {
+    public GHRelease checkUpdate() throws IOException {
         GitHub gitHub = GitHub.connect();
         GHRepository repository = gitHub.getRepositoryById(358708505);
         GHRelease release = repository.getLatestRelease();
 
-//        if (release.getTagName().equals(Config.getInstance().getVersion()))
-//            return null;
+        if (release.getTagName().equals(Config.getInstance().getVersion()))
+            return null;
 
         List<GHAsset> assets = release.listAssets().toList();
 
         for (GHAsset asset : assets) {
-            System.out.println(asset.getContentType());
-            if (asset.getName().equals("Luna.rar")) {
+            if (asset.getName().equals("Luna.jar")) {
                 browserDownloadUrl = asset.getBrowserDownloadUrl();
-                return release.getBody();
+                return release;
             }
         }
         return null;
@@ -55,7 +55,7 @@ public class UpdateApplication {
 
             InputStream is = connection.getInputStream();
 
-            File file = new File("update\\luna.rar");
+            File file = new File("update\\luna.jar");
 
             if (file.exists())
                 file.delete();
@@ -74,6 +74,7 @@ public class UpdateApplication {
                 os.write(buffer, 0, length);
                 downloaded += length;
                 downloadStatus.accept((int)(((double) downloaded / (double) contentLength) * 100.0));
+                //System.out.println((int)(((double) downloaded / (double) contentLength) * 100.0));
             }
 
             os.close();
@@ -83,11 +84,5 @@ public class UpdateApplication {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        UpdateApplication updateApplication = new UpdateApplication();
-        updateApplication.checkUpdate();
-        updateApplication.downloadUpdate(System.out::println);
     }
 }

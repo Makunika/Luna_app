@@ -6,7 +6,7 @@ import javafx.scene.Parent
 import javafx.scene.layout.HBox
 import tornadofx.*
 
-class Browser: Fragment("Браузер") {
+class BrowserFragment: Fragment("Браузер") {
 
     val url: String by param()
 

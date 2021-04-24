@@ -36,7 +36,7 @@ public class HttpService extends ServiceThread {
     @Override
     public void shutdown() {
         if (server != null) {
-            server.stop(3);
+            server.stop(1);
         }
         super.shutdown();
     }

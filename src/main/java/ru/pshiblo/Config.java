@@ -32,9 +32,6 @@ public class Config {
     @Property(propertyName = "tokenDiscord")
     private String tokenDiscord;
 
-    @Property(propertyName = "version", defaultValue = "0.1.6")
-    private String version;
-
     private String videoId;
     private String liveChatId;
     private String path;
@@ -42,7 +39,6 @@ public class Config {
     private Userinfo userinfo;
 
     private ConfigProperties property;
-
 
     private Config() {
         try {
@@ -56,10 +52,14 @@ public class Config {
             }
 
             isDiscord = false;
-            System.out.println(this.toString());
+            //System.out.println(this.toString());
         }catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getVersion() {
+        return "0.1.6";
     }
 
     public void doRefresh() {
@@ -68,7 +68,7 @@ public class Config {
                 Property annotation = field.getAnnotation(Property.class);
 
                 String propertyName = annotation.propertyName();
-                String defaultValue = annotation.defaultValue().isBlank() ? null : annotation.defaultValue();
+                String defaultValue = annotation.defaultValue();
 
                 String value = property.getProperty(propertyName, defaultValue);
                 try {
@@ -166,16 +166,16 @@ public class Config {
         return tokenDiscord;
     }
 
+    public void setTokenDiscord(String tokenDiscord) {
+        this.tokenDiscord = tokenDiscord;
+    }
+
     public Userinfo getUserinfo() {
         return userinfo;
     }
 
     public void setUserinfo(Userinfo userinfo) {
         this.userinfo = userinfo;
-    }
-
-    public String getVersion() {
-        return version;
     }
 
     @Override

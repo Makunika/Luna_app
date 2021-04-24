@@ -1,6 +1,8 @@
 package ru.pshiblo.gui.views
 
+import com.jfoenix.controls.JFXPasswordField
 import com.jfoenix.controls.JFXProgressBar
+import com.jfoenix.controls.JFXTextField
 import javafx.application.Platform
 import javafx.geometry.Pos
 import javafx.scene.control.Alert
@@ -36,6 +38,21 @@ class MusicView : View("Luna") {
                 }
             }
 
+            add(JFXPasswordField().apply {
+                isLabelFloat = true
+                promptText = "Токен Discord бота"
+                text = Config.getInstance().tokenDiscord
+                textProperty().addListener(ChangeListener { observable, oldValue, newValue ->
+                    Config.getInstance().tokenDiscord = newValue
+                })
+            })
+
+            separator {
+                style {
+                    paddingBottom = 20.0
+                }
+            }
+
             Buttons.createButton("Использовать локальную музыку", size = 20.0).also {
                 add(it)
                 it.action {
@@ -57,6 +74,7 @@ class MusicView : View("Luna") {
             Buttons.createButton("Использовать дискорд бота для музыки", size = 20.0).also {
                 add(it)
                 it.action {
+
                     Config.getInstance().isDiscord = true
 
                     this.isDisable = true

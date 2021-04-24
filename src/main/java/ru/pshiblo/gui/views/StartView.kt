@@ -1,15 +1,75 @@
 package ru.pshiblo.gui.views
 
+import com.jfoenix.animation.alert.JFXAlertAnimation
+import com.jfoenix.controls.JFXAlert
+import com.jfoenix.controls.JFXDialogLayout
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import javafx.application.Platform
 import javafx.geometry.Pos
+import javafx.scene.control.Label
+import javafx.stage.Modality
+import ru.pshiblo.github.updating.UpdateApplication
 import ru.pshiblo.gui.factory.Dialogs
 import ru.pshiblo.gui.factory.Buttons
-import ru.pshiblo.gui.fragments.Browser
+import ru.pshiblo.gui.fragments.BrowserFragment
+import ru.pshiblo.gui.fragments.UpdateFragment
 import ru.pshiblo.services.youtube.YouTubeAuth
 import tornadofx.*
 
 class StartView: View("Luna") {
+
+    private fun checkUpdate() {
+        runAsync {
+            val updater = UpdateApplication()
+            val release = updater.checkUpdate()
+            if (release != null) {
+                Platform.runLater {
+                    val layout = JFXDialogLayout()
+
+                    layout.setBody(scrollpane(fitToWidth = true) {
+                        minHeight = 300.0
+
+                        style {
+                            backgroundColor += c("transparent")
+                            border = null
+                        }
+                        stylesheet {
+                            select(".scroll-pane .viewport") {
+                                backgroundColor += c("transparent")
+                            }
+                        }
+
+                        label(release.body) {
+                            style {
+                                fontSize = 14.px
+                            }
+                        }
+                    })
+                    layout.setHeading(label("Новое обновление ${release.name}"))
+
+                    val btnOk = Buttons.createButton("Обновить", size = 15.0)
+
+                    val btnCancel = Buttons.createButton("Отменить", size = 15.0)
+
+                    layout.setActions(btnOk, btnCancel)
+                    val alert = JFXAlert<Void>(currentWindow ?: currentStage ?: primaryStage)
+                    alert.isOverlayClose = true
+                    alert.animation = JFXAlertAnimation.CENTER_ANIMATION
+                    alert.setContent(layout)
+                    alert.initModality(Modality.NONE)
+                    btnOk.action {
+                        alert.close()
+                        find<UpdateFragment>(mapOf(UpdateFragment::release to release, UpdateFragment::updater to updater))
+                            .openWindow()
+                    }
+                    btnCancel.action {
+                        alert.close()
+                    }
+                    alert.show()
+                }
+            }
+        }
+    }
 
     override var root = hbox(alignment = Pos.CENTER) {
         vbox(10, alignment = Pos.CENTER) {
@@ -29,7 +89,7 @@ class StartView: View("Luna") {
                         if (!YouTubeAuth.auth { url ->
                                 println(url)
                                 Platform.runLater {
-                                    find<Browser>(mapOf(Browser::url to url)).openModal()
+                                    find<BrowserFragment>(mapOf(BrowserFragment::url to url)).openModal()
                                 }
                             }) {
                             Platform.runLater {
@@ -69,6 +129,7 @@ class StartView: View("Luna") {
                         hostServices.showDocument("https://myaccount.google.com/permissions?pli=1")
                     }
                 }
+                checkUpdate()
             }
         }
     }
