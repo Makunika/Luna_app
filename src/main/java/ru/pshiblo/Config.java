@@ -59,7 +59,7 @@ public class Config {
     }
 
     public String getVersion() {
-        return "0.1.6";
+        return "0.1.7";
     }
 
     public void doRefresh() {
