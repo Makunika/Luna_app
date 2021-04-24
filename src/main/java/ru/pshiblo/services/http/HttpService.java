@@ -11,11 +11,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class HttpService extends ServiceThread {
+
+    private HttpServer server;
+
     @Override
     protected void runInThread() {
         try {
             ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
-            HttpServer server = HttpServer.create(new InetSocketAddress("localhost", 5000), 0);
+            server = HttpServer.create(new InetSocketAddress("localhost", 5000), 0);
             server.createContext("/track", new CurrentTrackHandler());
             server.setExecutor(threadPoolExecutor);
             server.start();
@@ -28,5 +31,13 @@ public class HttpService extends ServiceThread {
     @Override
     public ServiceType getServiceType() {
         return ServiceType.HTTP;
+    }
+
+    @Override
+    public void shutdown() {
+        if (server != null) {
+            server.stop(3);
+        }
+        super.shutdown();
     }
 }

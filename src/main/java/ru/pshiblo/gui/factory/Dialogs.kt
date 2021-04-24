@@ -51,6 +51,5 @@ object Dialogs {
         alert.isHideOnEscape = true
         alert.isOverlayClose = false
         return alert
-
     }
 }

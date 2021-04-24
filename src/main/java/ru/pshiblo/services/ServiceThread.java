@@ -1,12 +1,21 @@
 package ru.pshiblo.services;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public abstract class ServiceThread implements Service {
 
     private ExecutorService executor;
+    private List<Consumer<Exception>> handleExceptions;
+
+    public ServiceThread() {
+        handleExceptions = new ArrayList<>();
+    }
 
     public void reRun() {
         shutdown();
@@ -19,7 +28,15 @@ public abstract class ServiceThread implements Service {
             throw new IllegalCallerException("executor is run!");
 
         executor = Executors.newSingleThreadExecutor();
-        executor.submit(this::runInThread);
+        executor.submit(() -> {
+            try {
+                runInThread();
+            } catch (Exception e) {
+                for (Consumer<Exception> handleException : handleExceptions) {
+                    handleException.accept(e);
+                }
+            }
+        });
     }
 
     @Override
@@ -47,5 +64,9 @@ public abstract class ServiceThread implements Service {
         return executor != null;
     }
 
-    protected abstract void runInThread();
+    public void subscribeException(Consumer<Exception> handler) {
+        handleExceptions.add(handler);
+    }
+
+    protected abstract void runInThread() throws Exception;
 }

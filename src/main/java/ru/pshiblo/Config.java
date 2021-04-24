@@ -32,6 +32,9 @@ public class Config {
     @Property(propertyName = "tokenDiscord")
     private String tokenDiscord;
 
+    @Property(propertyName = "version", defaultValue = "0.1.6")
+    private String version;
+
     private String videoId;
     private String liveChatId;
     private String path;
@@ -169,6 +172,10 @@ public class Config {
 
     public void setUserinfo(Userinfo userinfo) {
         this.userinfo = userinfo;
+    }
+
+    public String getVersion() {
+        return version;
     }
 
     @Override

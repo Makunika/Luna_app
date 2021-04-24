@@ -42,7 +42,7 @@ public class DiscordMusicService extends ServiceThread implements MusicService {
     }
 
     @Override
-    protected void runInThread() {
+    protected void runInThread() throws Exception {
         try {
             listener = new DiscordListener();
             jda = JDABuilder.create(Config.getInstance().getTokenDiscord(), GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_VOICE_STATES)
@@ -54,6 +54,7 @@ public class DiscordMusicService extends ServiceThread implements MusicService {
         } catch (LoginException e) {
             e.printStackTrace();
             ConsoleOut.alert(e.getMessage());
+            throw e;
         }
     }
 

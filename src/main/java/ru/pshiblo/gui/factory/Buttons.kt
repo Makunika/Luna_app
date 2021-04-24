@@ -3,6 +3,7 @@ package ru.pshiblo.gui.factory
 import com.jfoenix.controls.JFXButton
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
+import javafx.scene.Cursor
 import javafx.scene.control.Button
 import tornadofx.c
 import tornadofx.px
@@ -20,6 +21,7 @@ object Buttons {
                 backgroundColor += c("#0A75AD")
                 textFill = c("white")
                 fontSize = size.px
+                cursor = Cursor.HAND
             }
             bt.graphicTextGap = 15.0
 
@@ -31,6 +33,7 @@ object Buttons {
                 backgroundColor += c("#0A75AD")
                 textFill = c("white")
                 fontSize = size.px
+                cursor = Cursor.HAND
             }
 
             return bt

@@ -1,14 +1,19 @@
 package ru.pshiblo.gui.views
 
 import com.jfoenix.controls.JFXProgressBar
+import javafx.application.Platform
 import javafx.geometry.Pos
+import javafx.scene.control.Alert
+import javafx.scene.control.ButtonType
 import ru.pshiblo.Config
 import ru.pshiblo.gui.factory.Buttons
+import ru.pshiblo.gui.factory.Dialogs
 import ru.pshiblo.services.Context
 import ru.pshiblo.services.audio.discord.DiscordMusicService
 import ru.pshiblo.services.audio.local.LocalMusicService
 import ru.pshiblo.services.http.HttpService
 import tornadofx.*
+import javax.security.auth.login.LoginException
 
 class MusicView : View("Luna") {
     override val root = hbox(alignment = Pos.CENTER) {
@@ -57,7 +62,19 @@ class MusicView : View("Luna") {
                     this.isDisable = true
                     pb.isVisible = true
                     runAsync {
-                        Context.addServiceAndStart(DiscordMusicService())
+                        Context.addServiceAndStart(DiscordMusicService().apply {
+                            subscribeException { e ->
+                                if (e is LoginException) {
+                                    Platform.runLater {
+                                        runAsync {
+                                            Context.removeAllService()
+                                        }
+                                        alert(Alert.AlertType.ERROR, "Токен", "Токен дискорда неверный! Введите его снова, нажав кнопку \"назад\"",
+                                        ButtonType.OK);
+                                    }
+                                }
+                            }
+                        })
                         Context.addServiceAndStart(HttpService())
                     } ui {
                         this.isDisable = false
