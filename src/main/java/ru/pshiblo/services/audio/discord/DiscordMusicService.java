@@ -64,6 +64,7 @@ public class DiscordMusicService extends ServiceThread implements MusicService {
         listener = null;
         if (jda != null) {
             jda.shutdown();
+            jda = null;
         }
         super.shutdown();
     }

@@ -84,13 +84,16 @@ class MusicView : View("Luna") {
                             subscribeException { e ->
                                 if (e is LoginException) {
                                     Platform.runLater {
-                                        runAsync {
-                                            Context.removeAllService()
-                                        }
                                         alert(Alert.AlertType.ERROR, "Токен", "Токен дискорда неверный! Введите его снова, нажав кнопку \"назад\"",
                                         ButtonType.OK);
                                     }
+                                } else {
+                                    Platform.runLater {
+                                        alert(Alert.AlertType.ERROR, "Ошибка", e.message ?: "Возникла исключительная ситуация, помогите",
+                                            ButtonType.OK);
+                                    }
                                 }
+                                e.printStackTrace()
                             }
                         })
                         Context.addServiceAndStart(HttpService())

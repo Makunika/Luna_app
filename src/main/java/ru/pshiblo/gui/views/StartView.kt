@@ -26,22 +26,30 @@ class StartView: View("Luna") {
                 Platform.runLater {
                     val layout = JFXDialogLayout()
 
-                    layout.setBody(scrollpane(fitToWidth = true) {
-                        minHeight = 300.0
+                    layout.setBody(vbox(5) {
+                        scrollpane(fitToWidth = true) {
+                            minHeight = 300.0
 
-                        style {
-                            backgroundColor += c("transparent")
-                            border = null
-                        }
-                        stylesheet {
-                            select(".scroll-pane .viewport") {
+                            style {
                                 backgroundColor += c("transparent")
+                                border = null
+                            }
+                            stylesheet {
+                                select(".scroll-pane .viewport") {
+                                    backgroundColor += c("transparent")
+                                }
+                            }
+
+                            label(release.body) {
+                                style {
+                                    fontSize = 14.px
+                                }
                             }
                         }
-
-                        label(release.body) {
-                            style {
-                                fontSize = 14.px
+                        separator()
+                        hyperlink("Обновление на сайте") {
+                            action {
+                                hostServices.showDocument(release.htmlUrl.toExternalForm())
                             }
                         }
                     })
