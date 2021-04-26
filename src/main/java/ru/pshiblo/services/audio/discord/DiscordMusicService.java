@@ -1,6 +1,5 @@
 package ru.pshiblo.services.audio.discord;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -9,7 +8,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import ru.pshiblo.Config;
 import ru.pshiblo.gui.log.ConsoleOut;
-import ru.pshiblo.services.MusicService;
+import ru.pshiblo.services.audio.MusicService;
 import ru.pshiblo.services.ServiceThread;
 import ru.pshiblo.services.ServiceType;
 

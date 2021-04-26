@@ -1,5 +1,7 @@
 package ru.pshiblo.services;
 
+import ru.pshiblo.services.audio.MusicService;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Context {

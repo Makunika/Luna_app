@@ -1,4 +1,4 @@
-package ru.pshiblo.services.youtube.listener;
+package ru.pshiblo.services.broadcast.listener;
 
 import javafx.beans.property.SimpleStringProperty;
 

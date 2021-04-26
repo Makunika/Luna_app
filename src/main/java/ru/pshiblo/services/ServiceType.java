@@ -4,6 +4,6 @@ public enum ServiceType {
     MUSIC,
     HTTP,
     KEYPRESS,
-    YOUTUBE_LIST,
-    YOUTUBE_POST;
+    CHAT_LIST,
+    CHAT_POST,
 }

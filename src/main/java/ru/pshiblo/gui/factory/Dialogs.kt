@@ -15,7 +15,7 @@ object Dialogs {
         val body = Label(text)
         body.style {
             textFill = c("red")
-            fontSize = 20.px
+            fontSize = 15.px
         }
         layout.setBody(body)
 
@@ -23,7 +23,7 @@ object Dialogs {
         btnOk.buttonType = JFXButton.ButtonType.FLAT
         btnOk.style {
             textFill = c("red")
-            fontSize = 20.px
+            fontSize = 15.px
             backgroundColor += c("white")
         }
 

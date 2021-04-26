@@ -1,4 +1,4 @@
-package ru.pshiblo.services;
+package ru.pshiblo.services.audio;
 
 import ru.pshiblo.services.Service;
 

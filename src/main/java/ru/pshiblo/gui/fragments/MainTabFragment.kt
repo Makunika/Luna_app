@@ -7,26 +7,40 @@ import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.text.FontWeight
 import ru.pshiblo.Config
+import ru.pshiblo.gui.ConfigGUI
 import ru.pshiblo.gui.factory.Dialogs
 import ru.pshiblo.gui.factory.Buttons
 import ru.pshiblo.services.Context
 import ru.pshiblo.services.ServiceType
+import ru.pshiblo.services.broadcast.twitch.TwitchChatListService
+import ru.pshiblo.services.broadcast.twitch.TwitchChatPostService
 import ru.pshiblo.services.keypress.GlobalKeyListenerService
-import ru.pshiblo.services.youtube.ChatListService
-import ru.pshiblo.services.youtube.ChatPostService
-import ru.pshiblo.services.youtube.YouTubeAuth
+import ru.pshiblo.services.broadcast.youtube.YTChatListService
+import ru.pshiblo.services.broadcast.youtube.YTChatPostService
+import ru.pshiblo.services.broadcast.youtube.YouTubeAuth
 import tornadofx.*
+import kotlin.reflect.KMutableProperty
 
 class MainTabFragment : Fragment("Главная") {
 
     private var isRun = false
 
     private val videoIdTextField = JFXTextField().apply {
-        promptText = "ID трансляции"
+        promptText = "ID трансляции YouTube / Канал Twitch"
         isLabelFloat = true
         maxWidth = 200.0
+        if (ConfigGUI.isTwitch) {
+            text = Config.getInstance().twitchChannelName
+            Config.getInstance().videoId = Config.getInstance().twitchChannelName
+        } else {
+            text = ""
+            Config.getInstance().videoId = ""
+        }
         this.textProperty().addListener(ChangeListener { observable, oldValue, newValue ->
             Config.getInstance().videoId = newValue
+            if (ConfigGUI.isTwitch) {
+                Config.getInstance().twitchChannelName = newValue
+            }
         })
     }
 
@@ -36,8 +50,8 @@ class MainTabFragment : Fragment("Главная") {
                 val spinner = Dialogs.createSpinner(currentStage ?: primaryStage)
                 spinner.show()
                 runAsync {
-                    Context.removeService(ServiceType.YOUTUBE_POST)
-                    Context.removeService(ServiceType.YOUTUBE_LIST)
+                    Context.removeService(ServiceType.CHAT_POST)
+                    Context.removeService(ServiceType.CHAT_LIST)
                 } ui {
                     spinner.close()
                     videoIdTextField.isDisable = false
@@ -46,13 +60,22 @@ class MainTabFragment : Fragment("Главная") {
                 }
             } else {
                 if (validate()) {
-                    if (!YouTubeAuth.setLiveChatId()) {
+                    if (ConfigGUI.isTwitch) {
+                        Dialogs.createAlert("Правильность Twitch канала нельзя, поэтому если что перезапустите сервис!", currentStage ?: primaryStage).show()
+                    }
+                    if (!ConfigGUI.isTwitch && !YouTubeAuth.setLiveChatId()) {
                         Dialogs.createAlert("Неверный id трансляции", currentStage ?: primaryStage).show()
                         return@action
                     }
                     runAsync {
-                        Context.addServiceAndStart(ChatListService())
-                        Context.addServiceAndStart(ChatPostService())
+                        if (ConfigGUI.isTwitch) {
+                            Context.addServiceAndStart(TwitchChatListService())
+                            Context.addServiceAndStart(TwitchChatPostService())
+                        } else {
+                            Context.addServiceAndStart(YTChatListService())
+                            Context.addServiceAndStart(YTChatPostService())
+                        }
+
                     } ui {
                         videoIdTextField.isDisable = true
                         btn.text = "Остановить"
@@ -78,8 +101,8 @@ class MainTabFragment : Fragment("Главная") {
                             fontSize = 18.px
                         }
                     }
-                    if (Config.getInstance().isDiscord) {
-                        label("Перед запуском необходимо написать в дискорд текстовом канале !connect <название голосового канал>")
+                    label("Перед запуском необходимо написать в дискорд текстовом канале !connect <название голосового канал>") {
+                        visibleWhen(ConfigGUI.isDiscordProperty)
                     }
                     add(videoIdTextField)
                 }
@@ -145,6 +168,7 @@ class MainTabFragment : Fragment("Главная") {
                         promptText = "Задержка между получением сообщений чата (в секундах)"
                         isLabelFloat = true
                         maxWidth = 400.0
+                        enableWhen(ConfigGUI.isTwitchProperty.not())
                         this.textProperty().addListener(ChangeListener { observable, oldValue, newValue ->
                             val num = newValue.toLongOrNull()
                             if (num != null) {
@@ -202,12 +226,12 @@ class MainTabFragment : Fragment("Главная") {
     }
 
     private fun validate(): Boolean {
-        if (Config.getInstance().isDiscord && !Context.isInitService(ServiceType.MUSIC)) {
+        if (ConfigGUI.isDiscord && !Context.isInitService(ServiceType.MUSIC)) {
             Dialogs.createAlert("Забыл написать в канале !connect <название канала>", currentStage ?: primaryStage).show()
             return false
         }
         if (Config.getInstance().videoId.isNullOrEmpty()) {
-            Dialogs.createAlert("Забыл написать id трансляции", currentStage ?: primaryStage).show()
+            Dialogs.createAlert("Забыл написать id трансляции/название канала", currentStage ?: primaryStage).show()
             return false
         }
         return true

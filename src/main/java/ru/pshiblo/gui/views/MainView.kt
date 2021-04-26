@@ -3,17 +3,20 @@ package ru.pshiblo.gui.views
 import com.jfoenix.controls.JFXButton
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
+import javafx.beans.value.ObservableValue
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.Cursor
 import javafx.scene.image.Image
 import javafx.scene.shape.Circle
 import javafx.scene.text.FontWeight
+import javafx.util.StringConverter
 import ru.pshiblo.Config
+import ru.pshiblo.gui.ConfigGUI
 import ru.pshiblo.gui.factory.Dialogs
 import ru.pshiblo.gui.fragments.TabFragment
 import ru.pshiblo.services.Context
-import ru.pshiblo.services.youtube.YouTubeAuth
+import ru.pshiblo.services.broadcast.youtube.YouTubeAuth
 import tornadofx.*
 
 class MainView: View("Luna") {
@@ -28,30 +31,6 @@ class MainView: View("Luna") {
                         bottomAnchor = 10.0
                         leftAnchor = 10.0
                     }
-
-                    add(JFXButton("Назад").apply {
-                        val iconView = MaterialIconView(MaterialIcon.ARROW_BACK)
-                        iconView.fill = c("#4da5f6")
-                        graphic = iconView
-                        style {
-                            fontSize = 18.px
-                            paddingAll = 1.0
-                            textFill = c("#4da5f6")
-                            cursor = Cursor.HAND
-                        }
-                        buttonType = JFXButton.ButtonType.FLAT
-
-                        action {
-                            val spinner = Dialogs.createSpinner(currentStage ?: primaryStage)
-                            spinner.show()
-                            runAsync {
-                                Context.removeAllService()
-                            } ui {
-                                spinner.close()
-                                replaceWith<MusicView>()
-                            }
-                        }
-                    })
 
                     add(JFXButton("Выйти из аккаунта").apply {
                         val iconView = MaterialIconView(MaterialIcon.EXIT_TO_APP)
@@ -76,6 +55,32 @@ class MainView: View("Luna") {
                                 replaceWith<StartView>()
                             }
                         }
+                        visibleWhen(ConfigGUI.isTwitchProperty.not())
+
+                    })
+
+                    add(JFXButton("Назад").apply {
+                        val iconView = MaterialIconView(MaterialIcon.ARROW_BACK)
+                        iconView.fill = c("#4da5f6")
+                        graphic = iconView
+                        style {
+                            fontSize = 18.px
+                            paddingAll = 1.0
+                            textFill = c("#4da5f6")
+                            cursor = Cursor.HAND
+                        }
+                        buttonType = JFXButton.ButtonType.FLAT
+
+                        action {
+                            val spinner = Dialogs.createSpinner(currentStage ?: primaryStage)
+                            spinner.show()
+                            runAsync {
+                                Context.removeAllService()
+                            } ui {
+                                spinner.close()
+                                replaceWith<MusicView>()
+                            }
+                        }
                     })
                 }
                 vbox(5.0) {
@@ -93,7 +98,15 @@ class MainView: View("Luna") {
                             textFill = c("#4da5f6")
                         }
                         isWrapText = true
-                        text = Config.getInstance().userinfo.name
+                        textProperty().bindBidirectional(ConfigGUI.isTwitchProperty, object: StringConverter<Boolean>() {
+                            override fun toString(`object`: Boolean?): String {
+                                return Config.getInstance().userinfo.name
+                            }
+
+                            override fun fromString(string: String?): Boolean {
+                                return ConfigGUI.isTwitch
+                            }
+                        })
                         prefWidthProperty().bind(this@vbox.widthProperty());
                     }
                     var image: Image? = null
@@ -108,14 +121,8 @@ class MainView: View("Luna") {
                         imageView.clip = circle
                         add(imageView)
                     }
-
-
                 }
-
-
             }
-
-
         }
 
         center {

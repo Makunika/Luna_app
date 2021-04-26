@@ -1,15 +1,14 @@
 package ru.pshiblo.services.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import ru.pshiblo.gui.log.ConsoleOut;
 import ru.pshiblo.services.Context;
 import ru.pshiblo.services.ServiceType;
-import ru.pshiblo.services.audio.TrackScheduler;
-import ru.pshiblo.services.youtube.ChatPostService;
+import ru.pshiblo.services.broadcast.ChatPostService;
+import ru.pshiblo.services.broadcast.youtube.YTChatPostService;
 
 public class AudioLoadHandler implements AudioLoadResultHandler {
 
@@ -43,7 +42,7 @@ public class AudioLoadHandler implements AudioLoadResultHandler {
     @Override
     public void noMatches() {
         ConsoleOut.println("Трек " + track + " не найден");
-        ((ChatPostService) Context.getService(ServiceType.YOUTUBE_POST)).postMessage("Трек " + track + " не найден");
+        ((ChatPostService) Context.getService(ServiceType.CHAT_POST)).postMessage("Трек " + track + " не найден");
     }
 
     @Override

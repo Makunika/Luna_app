@@ -32,10 +32,15 @@ public class Config {
     @Property(propertyName = "tokenDiscord")
     private String tokenDiscord;
 
+    @Property(propertyName = "tokenTwitch")
+    private String tokenTwitch;
+
+    @Property(propertyName = "twitchChannelName")
+    private String twitchChannelName;
+
     private String videoId;
     private String liveChatId;
     private String path;
-    private boolean isDiscord;
     private Userinfo userinfo;
 
     private ConfigProperties property;
@@ -51,7 +56,6 @@ public class Config {
                 System.out.println("token discord is null!");
             }
 
-            isDiscord = false;
             //System.out.println(this.toString());
         }catch (IOException e) {
             e.printStackTrace();
@@ -74,7 +78,7 @@ public class Config {
                 try {
                     if (field.getType().isPrimitive()) {
                         if (field.getType().getSimpleName().equals("long")) {
-                            long defaultLong = defaultValue == null ? 0 : Long.parseLong(defaultValue);
+                            long defaultLong = Long.parseLong(defaultValue);
                             field.setLong(this, property.getLongProperty(propertyName, defaultLong));
                         }
                     } else if (field.getType().getSimpleName().equals("String")) {
@@ -154,14 +158,6 @@ public class Config {
         this.timeList = timeList;
     }
 
-    public boolean isDiscord() {
-        return isDiscord;
-    }
-
-    public void setDiscord(boolean discord) {
-        isDiscord = discord;
-    }
-
     public String getTokenDiscord() {
         return tokenDiscord;
     }
@@ -178,6 +174,22 @@ public class Config {
         this.userinfo = userinfo;
     }
 
+    public String getTokenTwitch() {
+        return tokenTwitch;
+    }
+
+    public void setTokenTwitch(String tokenTwitch) {
+        this.tokenTwitch = tokenTwitch;
+    }
+
+    public String getTwitchChannelName() {
+        return twitchChannelName;
+    }
+
+    public void setTwitchChannelName(String twitchChannelName) {
+        this.twitchChannelName = twitchChannelName;
+    }
+
     @Override
     public String toString() {
         return "Config{" +
@@ -187,7 +199,6 @@ public class Config {
                 ", videoId='" + videoId + '\'' +
                 ", liveChatId='" + liveChatId + '\'' +
                 ", path='" + path + '\'' +
-                ", isDiscord=" + isDiscord +
                 ", tokenDiscord='" + tokenDiscord + '\'' +
                 ", property=" + property +
                 '}';

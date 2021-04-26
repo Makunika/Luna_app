@@ -3,13 +3,9 @@ package ru.pshiblo.services.audio.local;
 import com.sedmelluq.discord.lavaplayer.format.AudioDataFormat;
 import com.sedmelluq.discord.lavaplayer.format.AudioPlayerInputStream;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import ru.pshiblo.services.MusicService;
+import ru.pshiblo.services.audio.MusicService;
 import ru.pshiblo.services.ServiceThread;
-import ru.pshiblo.gui.log.ConsoleOut;
 import ru.pshiblo.services.ServiceType;
 import ru.pshiblo.services.audio.AudioFactory;
 import ru.pshiblo.services.audio.AudioLoadHandler;
@@ -17,8 +13,6 @@ import ru.pshiblo.services.audio.TrackScheduler;
 
 import javax.sound.sampled.*;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Queue;
 
 import static com.sedmelluq.discord.lavaplayer.format.StandardAudioDataFormats.COMMON_PCM_S16_BE;
 

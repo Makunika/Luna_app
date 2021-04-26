@@ -1,13 +1,18 @@
 package ru.pshiblo.gui.views
 
+import com.jfoenix.controls.JFXButton
 import com.jfoenix.controls.JFXPasswordField
 import com.jfoenix.controls.JFXProgressBar
 import com.jfoenix.controls.JFXTextField
+import de.jensd.fx.glyphs.materialicons.MaterialIcon
+import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.application.Platform
 import javafx.geometry.Pos
+import javafx.scene.Cursor
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
 import ru.pshiblo.Config
+import ru.pshiblo.gui.ConfigGUI
 import ru.pshiblo.gui.factory.Buttons
 import ru.pshiblo.gui.factory.Dialogs
 import ru.pshiblo.services.Context
@@ -56,7 +61,7 @@ class MusicView : View("Luna") {
             Buttons.createButton("Использовать локальную музыку", size = 20.0).also {
                 add(it)
                 it.action {
-                    Config.getInstance().isDiscord = false
+                    ConfigGUI.isDiscord = false
 
                     this.isDisable = true
 
@@ -75,7 +80,7 @@ class MusicView : View("Luna") {
                 add(it)
                 it.action {
 
-                    Config.getInstance().isDiscord = true
+                    ConfigGUI.isDiscord = true
 
                     this.isDisable = true
                     pb.isVisible = true
@@ -104,6 +109,28 @@ class MusicView : View("Luna") {
                     }
                 }
             }
+            separator {
+                style {
+                    paddingTop = 20.0
+                    paddingBottom = 20.0
+                }
+            }
+            add(JFXButton("Назад").apply {
+                val iconView = MaterialIconView(MaterialIcon.ARROW_BACK)
+                iconView.fill = c("#4da5f6")
+                graphic = iconView
+                style {
+                    fontSize = 18.px
+                    paddingAll = 1.0
+                    textFill = c("#4da5f6")
+                    cursor = Cursor.HAND
+                }
+                buttonType = JFXButton.ButtonType.FLAT
+
+                action {
+                    replaceWith<StartView>()
+                }
+            })
 
             add(pb)
         }

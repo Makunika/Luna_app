@@ -1,4 +1,4 @@
-package ru.pshiblo.services.youtube;
+package ru.pshiblo.services.broadcast.youtube;
 
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.LiveChatMessage;
@@ -8,11 +8,13 @@ import ru.pshiblo.Config;
 import ru.pshiblo.gui.log.ConsoleOut;
 import ru.pshiblo.services.ServiceThread;
 import ru.pshiblo.services.ServiceType;
+import ru.pshiblo.services.broadcast.ChatPostService;
 
 import java.io.IOException;
 import java.util.List;
 
-public class ChatPostService extends ServiceThread {
+public class YTChatPostService extends ServiceThread implements ChatPostService
+{
 
     @Override
     protected void runInThread() {
@@ -54,12 +56,13 @@ public class ChatPostService extends ServiceThread {
         }
     }
 
+    @Override
     public void postMessage(String message) {
         new Thread(() -> insert(message)).start();
     }
 
     @Override
     public ServiceType getServiceType() {
-        return ServiceType.YOUTUBE_POST;
+        return ServiceType.CHAT_POST;
     }
 }
