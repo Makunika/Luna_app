@@ -17,7 +17,7 @@ public class UpdateApplication {
     private String browserDownloadUrl;
 
     public GHRelease checkUpdate() throws IOException {
-        GitHub gitHub = GitHub.connect();
+        GitHub gitHub = GitHub.connectAnonymously();
         GHRepository repository = gitHub.getRepositoryById(358708505);
         GHRelease release = repository.getLatestRelease();
 

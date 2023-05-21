@@ -8,7 +8,6 @@ import ru.pshiblo.gui.log.ConsoleOut;
 import ru.pshiblo.services.Context;
 import ru.pshiblo.services.ServiceType;
 import ru.pshiblo.services.broadcast.ChatPostService;
-import ru.pshiblo.services.broadcast.youtube.YTChatPostService;
 
 public class AudioLoadHandler implements AudioLoadResultHandler {
 

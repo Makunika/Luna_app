@@ -21,8 +21,6 @@ import tornadofx.*
 
 class MainView: View("Luna") {
 
-
-
     override val root = borderpane {
         left {
             anchorpane {
